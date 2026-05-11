@@ -20,3 +20,21 @@ exports.createUser = async (req, res) => {
     res.status(500).json({ message: 'Failed to create user', error: err.message })
   }
 }
+
+exports.getUserById = async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid user ID' })
+    }
+
+    const user = await User.findById(req.params.id)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json(user)
+  } catch (error) {
+    res.status(500).json({ message: 'Could not fetch user' })
+  }
+}
