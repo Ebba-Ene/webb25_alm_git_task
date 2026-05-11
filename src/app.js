@@ -35,6 +35,28 @@ app.get('/', (req, res) => {
         }
       },
       'DELETE /:id': 'Delete a product'
+    },
+
+    '/users': {
+      'GET /': 'Get all users',
+      'GET /:id': 'Get user by id',
+      'POST /': {
+        Description: 'Create a user',
+        body: {
+          name: 'required string',
+          email: 'required string',
+          password: 'required string'
+        }
+      },
+      'PUT /:id': {
+        Description: 'Update a user',
+        body: {
+          name: 'optional string',
+          email: 'optional string',
+          password: 'optional string'
+        }
+      },
+      'DELETE /:id': 'Delete a user'
     }
   })
 })

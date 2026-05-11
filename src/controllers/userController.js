@@ -38,3 +38,45 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ message: 'Could not fetch user' })
   }
 }
+
+exports.updateUser = async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid user ID' })
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    })
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json(updatedUser)
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Invalid user data' })
+    }
+    res.status(500).json({ message: 'Could not update user' })
+  }
+}
+
+exports.deleteUser = async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid user ID' })
+    }
+
+    const deletedUser = await User.findByIdAndDelete(req.params.id)
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json({ message: 'User deleted' })
+  } catch (error) {
+    res.status(500).json({ message: 'Could not delete user' })
+  }
+}
