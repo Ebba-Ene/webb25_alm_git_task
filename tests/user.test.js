@@ -70,4 +70,36 @@ describe('User model validation', () => {
         const isMatch = await bcrypt.compare(rawPassword, user.password)
         expect(isMatch).toBe(true)
     })
+
+    it('updates user non password fields without changing password', async () => {
+        const user = await User.create({
+            name: 'Elon Musk',
+            email: 'elon@musk.com',
+            password: 'password123'
+        });
+
+        const updatedUser = await User.findByIdAndUpdate(user._id, { name: 'Jeff Bezos' }, { new: true });
+
+        expect(updatedUser.name).toBe('Jeff Bezos');
+        expect(updatedUser.password).toBe(user.password);
+    });
+
+    it('hashes password when updating password', async () => {
+        const user = await User.create({
+            name: 'Elon Musk',
+            email: 'elon@musk.com',
+            password: 'password123'
+        });
+
+        const updatedUser = await User.findByIdAndUpdate(user._id, { password: 'newpassword456' }, { new: true });
+
+        expect(updatedUser.password).not.toBe('newpassword456');
+        expect(updatedUser.password).toMatch(/^\$2b\$/);
+
+        const isMatch = await bcrypt.compare('newpassword456', updatedUser.password);
+        expect(isMatch).toBe(true);
+
+        const oldMatch = await bcrypt.compare('password123', updatedUser.password);
+        expect(oldMatch).toBe(false);
+    });
 });
